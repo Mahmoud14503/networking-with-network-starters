@@ -383,7 +383,6 @@ GameObject:
   - component: {fileID: 435683147}
   - component: {fileID: 435683152}
   - component: {fileID: 435683154}
-  - component: {fileID: 435683153}
   - component: {fileID: 435683155}
   m_Layer: 0
   m_Name: Cube
@@ -538,23 +537,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &435683153
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 435683146}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 1
-  AutoSetKinematicOnDespawn: 1
 --- !u!114 &435683154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -612,7 +594,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43e5e87e76fb25f42a8b21f922142f8f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkGrabbable
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkOwnershipRequest
   ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &466431063
 GameObject:
@@ -759,7 +741,6 @@ GameObject:
   - component: {fileID: 706001140}
   - component: {fileID: 706001145}
   - component: {fileID: 706001147}
-  - component: {fileID: 706001146}
   - component: {fileID: 706001148}
   m_Layer: 0
   m_Name: Cube (2)
@@ -914,23 +895,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &706001146
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 706001139}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 1
-  AutoSetKinematicOnDespawn: 1
 --- !u!114 &706001147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -988,7 +952,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43e5e87e76fb25f42a8b21f922142f8f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkGrabbable
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkOwnershipRequest
   ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &753244414
 GameObject:
@@ -1005,7 +969,6 @@ GameObject:
   - component: {fileID: 753244415}
   - component: {fileID: 753244420}
   - component: {fileID: 753244422}
-  - component: {fileID: 753244421}
   - component: {fileID: 753244423}
   m_Layer: 0
   m_Name: Cube (1)
@@ -1160,23 +1123,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &753244421
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 753244414}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 1
-  AutoSetKinematicOnDespawn: 1
 --- !u!114 &753244422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1234,7 +1180,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43e5e87e76fb25f42a8b21f922142f8f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkGrabbable
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkOwnershipRequest
   ShowTopMostFoldoutHeaderGroup: 1
 --- !u!4 &788210645 stripped
 Transform:
