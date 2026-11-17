@@ -28,7 +28,9 @@ public class NetworkHands : NetworkBehaviour
 
     private void Awake()
     {
-        leapProvider = Hands.Provider;
+        // stream exactly what the standard Physical Hands Manager outputs (the hand the user sees)
+        var phys = FindAnyObjectByType<Leap.PhysicalHands.PhysicalHandsManager>();
+        leapProvider = phys != null ? phys : Hands.Provider;
     }
 
     public override void OnNetworkSpawn()
