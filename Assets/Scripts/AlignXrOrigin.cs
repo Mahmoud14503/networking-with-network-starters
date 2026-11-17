@@ -89,10 +89,6 @@ public class NetworkedOriginSpawner : MonoBehaviour
         var offPos = trackingSpace == transform ? Vector3.zero : trackingSpace.localPosition;
         var rootRot = worldFromTracking.rotation * Quaternion.Inverse(offRot);
         transform.SetPositionAndRotation(worldFromTracking.position - rootRot * offPos, Quaternion.Euler(0f, rootRot.eulerAngles.y, 0f));
-
-        float rms = Mathf.Sqrt(Enumerable.Range(0, measured.Length)
-            .Select(i => (yaw * tablePositions[i] + trackingFromTable.position - measured[i]).sqrMagnitude).Average());
-        NetworkDebug.Event("calibration", 0, $"rms_mm={rms * 1000f:F2};samples={string.Join("|", samples.Values.Select(l => l.Count))}");
     }
 
     static Vector3 RobustMean(List<Vector3> pts)
@@ -125,7 +121,6 @@ public class NetworkedOriginSpawner : MonoBehaviour
             if (qr != null) qr.SetValue(cfg, on); else cfg.GetType().GetField("QRCodeTrackingEnabled").SetValue(cfg, on);
             if (cfgProp is System.Reflection.PropertyInfo pi) pi.SetValue(settings, cfg);
             else ((System.Reflection.FieldInfo)cfgProp).SetValue(settings, cfg);
-            NetworkDebug.Event("qr_tracking", 0, $"enabled={on}");
         }
         catch (Exception e) { Debug.LogWarning($"[CAL] enable QR Code Tracking in the MRUK component ({e.Message})"); }
     }

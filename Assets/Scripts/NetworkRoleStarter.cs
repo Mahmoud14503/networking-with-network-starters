@@ -42,7 +42,5 @@ public class NetworkStarter : MonoBehaviour
         NetworkManager.Singleton.OnClientDisconnectCallback += id => Debug.Log($"[NET] disconnected: {NetworkManager.Singleton.DisconnectReason}");
         NetworkManager.Singleton.StartClient();   // connect first, so nothing below can block it
         gameObject.AddComponent<HandBlendProvider>();
-        gameObject.AddComponent<GraspDetector>().hand = Leap.Chirality.Left;
-        gameObject.AddComponent<GraspDetector>().hand = Leap.Chirality.Right;
     }
 }

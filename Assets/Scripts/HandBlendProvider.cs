@@ -8,11 +8,24 @@ using UnityEngine;
 // so the rendered hand never freezes or snaps. Re-binds the local hand models at start.
 public class HandBlendProvider : PostProcessProvider
 {
-    public float blendStart = 0.01f, blendEnd = 0.035f, smoothTime = 0.05f;
+    public float blendStart = 0.10f, blendEnd = 0.15f, smoothTime = 0.05f;
 
-    static readonly float[] separation = new float[2], weight = new float[2];
-    public static float Separation(Chirality c) => separation[(int)c];
-    public static float Weight(Chirality c) => weight[(int)c];
+    readonly float[] weight = new float[2];
+
+    // raw tracked hands = the Physical Hands Manager's input provider
+    static LeapProvider raw;
+    public static LeapProvider RawProvider
+    {
+        get
+        {
+            if (raw == null)
+            {
+                var phys = FindAnyObjectByType<PhysicalHandsManager>();
+                raw = phys != null ? phys.InputProvider : Hands.Provider;
+            }
+            return raw;
+        }
+    }
 
     readonly VectorHand vPhys = new VectorHand(), vRaw = new VectorHand();
 
@@ -27,7 +40,7 @@ public class HandBlendProvider : PostProcessProvider
 
     public override void ProcessFrame(ref Frame frame)
     {
-        var raw = GraspDetector.RawProvider;
+        var raw = RawProvider;
         if (raw == null) return;
         foreach (var ph in frame.Hands)
         {
@@ -38,7 +51,6 @@ public class HandBlendProvider : PostProcessProvider
             {
                 float sep = (ph.PalmPosition - rh.PalmPosition).magnitude;
                 for (int f = 0; f < 5; f++) sep = Mathf.Max(sep, (ph.fingers[f].TipPosition - rh.fingers[f].TipPosition).magnitude);
-                separation[c] = sep;
                 float target = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(blendStart, blendEnd, sep));
                 weight[c] = Mathf.Lerp(weight[c], target, 1f - Mathf.Exp(-Time.deltaTime / smoothTime));
             }

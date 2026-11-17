@@ -6,7 +6,7 @@ using UnityEngine;
 
 // NTP-style clock sync: the PC server is the time master; clients exchange one
 // request/response per second and keep the offset of the min-RTT sample of the last 16.
-// ClockSync.Now = shared timeline (server clock, seconds) used by all logs and hand timestamps.
+// ClockSync.Now = shared timeline (server clock, seconds) for hand timestamps and handover timing.
 public class ClockSync : MonoBehaviour
 {
     static readonly Stopwatch watch = Stopwatch.StartNew();
@@ -56,6 +56,5 @@ public class ClockSync : MonoBehaviour
         foreach (var s in samples) if (s.rtt < best.rtt) best = s;
         Offset = best.offset;
         BestRtt = best.rtt;
-        NetworkDebug.Event("rtt", 0, $"rtt_ms={rtt * 1000:F3};best_rtt_ms={best.rtt * 1000:F3};offset_ms={Offset * 1000:F3}");
     }
 }
