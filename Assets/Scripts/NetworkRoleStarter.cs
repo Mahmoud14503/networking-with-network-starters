@@ -26,9 +26,23 @@ public class NetworkStarter : MonoBehaviour
     void Start()
     {
         var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        transport.SetConnectionData("192.168.0.104", 7777);
+        gameObject.AddComponent<ClockSync>();
+        if (Application.platform != RuntimePlatform.Android)
+        {
+            // Lab PC: dedicated server (no player, no hands) and time master
+            transport.SetConnectionData("0.0.0.0", 7777, "0.0.0.0");
+            NetworkManager.Singleton.StartServer();
+            Debug.Log("[NET] Dedicated server listening on 0.0.0.0:7777");
+            if (FindAnyObjectByType<VirtualCameraRig>() == null) gameObject.AddComponent<VirtualCameraRig>();
+            return;
+        }
+        transport.SetConnectionData("192.168.0.100", 7777);
         Debug.Log($"[NET] Connecting to {transport.ConnectionData.Address}:{transport.ConnectionData.Port}");
-        NetworkManager.Singleton.StartClient();
-        Debug.Log($"[NET] client connected successfully");
+        NetworkManager.Singleton.OnClientConnectedCallback += id => Debug.Log($"[NET] connected as client {id}");
+        NetworkManager.Singleton.OnClientDisconnectCallback += id => Debug.Log($"[NET] disconnected: {NetworkManager.Singleton.DisconnectReason}");
+        NetworkManager.Singleton.StartClient();   // connect first, so nothing below can block it
+        gameObject.AddComponent<HandBlendProvider>();
+        gameObject.AddComponent<GraspDetector>().hand = Leap.Chirality.Left;
+        gameObject.AddComponent<GraspDetector>().hand = Leap.Chirality.Right;
     }
 }

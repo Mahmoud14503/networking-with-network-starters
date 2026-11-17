@@ -563,7 +563,7 @@ MonoBehaviour:
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 1
   TickSyncChildren: 0
-  UseUnreliableDeltas: 0
+  UseUnreliableDeltas: 1
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -724,7 +724,7 @@ MonoBehaviour:
   HandToIgnoreGrabs: 2
   _disableAllGrabbing: 1
   HandToIgnoreCollisions: 2
-  _disableAllHandCollisions: 1
+  _disableAllHandCollisions: 0
   _disableCollisionOnChildren: 1
 --- !u!1 &706001139
 GameObject:
@@ -921,7 +921,7 @@ MonoBehaviour:
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 1
   TickSyncChildren: 0
-  UseUnreliableDeltas: 0
+  UseUnreliableDeltas: 1
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -1149,7 +1149,7 @@ MonoBehaviour:
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 1
   TickSyncChildren: 0
-  UseUnreliableDeltas: 0
+  UseUnreliableDeltas: 1
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -2333,7 +2333,7 @@ MonoBehaviour:
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 053764a5320e3fa4db9aa6230938da66, type: 2}
-    TickRate: 30
+    TickRate: 90
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
     ConnectionData: 

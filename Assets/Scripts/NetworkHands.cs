@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Leap;
 using Leap.Encoding;
 using UnityEngine;
@@ -18,6 +19,12 @@ public class NetworkHands : NetworkBehaviour
                    rightBytes = new byte[VectorHand.NUM_BYTES];
     private bool leftTracked, rightTracked;
     private bool leftHandReady, rightHandReady;
+
+    // jitter buffer: timestamped snapshots (ClockSync timeline), rendered interpolationDelay behind
+    [SerializeField] private float interpolationDelay = 0.05f;
+    private struct Snapshot { public double t; public VectorHand l, r; }
+    private readonly List<Snapshot> buffer = new List<Snapshot>();
+    private readonly VectorHand leftLerp = new VectorHand(), rightLerp = new VectorHand();
 
     private void Awake()
     {
@@ -54,6 +61,7 @@ public class NetworkHands : NetworkBehaviour
     private void Update()
     {
         if (IsOwner) return;
+        Interpolate(ClockSync.Now - interpolationDelay);
 
         if (leftModel != null && leftHandReady)
         {
@@ -69,7 +77,7 @@ public class NetworkHands : NetworkBehaviour
     }
 
     private float _lastSendTime;
-    private const float SEND_INTERVAL = 0.016f; // 60Hz
+    private const float SEND_INTERVAL = 0.008f; // every tracking frame: 72-90 Hz
 
     private void OnUpdateFrame(Frame frame)
     {
@@ -84,47 +92,54 @@ public class NetworkHands : NetworkBehaviour
         rightTracked = ind != -1;
         if (rightTracked) { rightVector.Encode(frame.Hands[ind]); rightVector.FillBytes(rightBytes); }
 
-        UpdateHandServerRpc(NetworkManager.Singleton.LocalClientId, leftTracked, rightTracked, leftBytes, rightBytes);
+        UpdateHandRpc(ClockSync.Now, leftTracked, rightTracked, leftBytes, rightBytes);
     }
 
-    [ServerRpc]
-    private void UpdateHandServerRpc(ulong clientId, bool lTracked, bool rTracked, byte[] lBytes, byte[] rBytes)
+    // owner -> server -> other Quest (and the PC server itself), unreliable, timestamped
+    [Rpc(SendTo.NotOwner, Delivery = RpcDelivery.Unreliable)]
+    private void UpdateHandRpc(double t, bool lTracked, bool rTracked, byte[] lBytes, byte[] rBytes)
     {
-        LoadHandsData(lTracked, rTracked, lBytes, rBytes);
-        UpdateHandClientRpc(clientId, lTracked, rTracked, lBytes, rBytes);
+        var snap = new Snapshot { t = t };
+        if (lTracked) { snap.l = new VectorHand(); snap.l.ReadBytes(lBytes); }
+        if (rTracked) { snap.r = new VectorHand(); snap.r.ReadBytes(rBytes); }
+        int i = buffer.Count;
+        while (i > 0 && buffer[i - 1].t > t) i--;   // unreliable: may arrive out of order
+        buffer.Insert(i, snap);
+        if (buffer.Count > 64) buffer.RemoveAt(0);
     }
 
-    [ClientRpc]
-    private void UpdateHandClientRpc(ulong clientId, bool lTracked, bool rTracked, byte[] lBytes, byte[] rBytes)
+    private void Interpolate(double renderTime)
     {
-        if (IsOwner) return;
-        LoadHandsData(lTracked, rTracked, lBytes, rBytes);
+        if (buffer.Count == 0) return;
+        int i = buffer.Count - 1;
+        while (i > 0 && buffer[i].t > renderTime) i--;
+        var a = buffer[i];
+        var b = i + 1 < buffer.Count ? buffer[i + 1] : a;
+        float u = b.t > a.t ? Mathf.Clamp01((float)((renderTime - a.t) / (b.t - a.t))) : 0f;
+        if (i > 1) buffer.RemoveRange(0, i - 1);
+        LoadHandsData(Lerp(a.l, b.l, u, leftLerp), Lerp(a.r, b.r, u, rightLerp));
     }
 
-    private void LoadHandsData(bool lTracked, bool rTracked, byte[] lBytes, byte[] rBytes)
+    private static VectorHand Lerp(VectorHand a, VectorHand b, float u, VectorHand into)
+    {
+        if (a != null && b != null) { into.FillLerped(a, b, u); return into; }
+        return u < 0.5f ? a : b;   // hand appeared / disappeared between snapshots
+    }
+
+    private void LoadHandsData(VectorHand l, VectorHand r)
     {
         if (leftModel != null)
         {
-            leftModel.gameObject.SetActive(lTracked);
-            if (lTracked)
-            {
-                leftVector.ReadBytes(lBytes);
-                leftVector.Decode(leftHandLatest); // store latest, Update() drives it
-                leftHandReady = true;
-            }
-            else leftHandReady = false;
+            leftModel.gameObject.SetActive(l != null);
+            if (l != null) l.Decode(leftHandLatest); // store latest, Update() drives it
+            leftHandReady = l != null;
         }
 
         if (rightModel != null)
         {
-            rightModel.gameObject.SetActive(rTracked);
-            if (rTracked)
-            {
-                rightVector.ReadBytes(rBytes);
-                rightVector.Decode(rightHandLatest);
-                rightHandReady = true;
-            }
-            else rightHandReady = false;
+            rightModel.gameObject.SetActive(r != null);
+            if (r != null) r.Decode(rightHandLatest);
+            rightHandReady = r != null;
         }
     }
 }
