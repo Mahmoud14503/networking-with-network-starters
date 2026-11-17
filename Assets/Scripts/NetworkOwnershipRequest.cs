@@ -52,13 +52,6 @@ public class NetworkOwnershipRequest : NetworkBehaviour
     public override void OnGainedOwnership()
     {
         Debug.Log($"[GRAB] Client {NetworkManager.Singleton.LocalClientId} gained ownership");
-        var rb = GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.isKinematic = false;
-            rb.useGravity = true;
-            Debug.Log($"[GRAB] Rigidbody — isKinematic: {rb.isKinematic}, useGravity: {rb.useGravity}");
-        }
     }
 
     public override void OnLostOwnership()
