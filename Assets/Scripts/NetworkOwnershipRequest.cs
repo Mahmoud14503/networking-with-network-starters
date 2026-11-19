@@ -7,11 +7,17 @@ using Leap.PhysicalHands;
 // this headset asks the server for ownership and gets it, even if the other user is holding it
 // (latest grab wins). Letting go changes nothing on the network: the owner keeps the cube and
 // Ultraleap's throw / gravity runs on its copy.
+// Cooldown: a headset that just lost the cube (the giver) can't take it back for
+// regrabCooldown seconds, so the two hands can't keep pulling it back and forth.
 public class NetworkOwnershipRequest : NetworkBehaviour, IPhysicalHandGrab
 {
     Rigidbody rb;
     readonly HashSet<ContactHand> grabbing = new HashSet<ContactHand>();   // local hands grabbing this cube
     Vector3 lastVel, lastAngVel;
+
+    [Tooltip("Seconds after losing ownership before the same headset may take the cube back.")]
+    public float regrabCooldown = 2f;
+    readonly Dictionary<ulong, float> lostOwnershipAt = new Dictionary<ulong, float>();   // server only
 
     void Awake()
     {
@@ -40,7 +46,10 @@ public class NetworkOwnershipRequest : NetworkBehaviour, IPhysicalHandGrab
     void RequestOwnershipRpc(RpcParams p = default)
     {
         ulong c = p.Receive.SenderClientId;
-        if (OwnerClientId != c) NetworkObject.ChangeOwnership(c);
+        if (OwnerClientId == c) return;
+        if (lostOwnershipAt.TryGetValue(c, out float t) && Time.time - t < regrabCooldown) return;   // giver still cooling down
+        lostOwnershipAt[OwnerClientId] = Time.time;   // the current owner becomes the giver
+        NetworkObject.ChangeOwnership(c);
     }
 
     // One simulator: the owner's copy is dynamic, every other copy kinematic and driven by the network.
